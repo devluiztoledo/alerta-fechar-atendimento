@@ -10,8 +10,7 @@
 
 ---
 
-# 📄 Script Tampermonkey – Mudar motivo INT6
-
+# 📄 Script Tampermonkey – Alerta Fechar Atendimento
 Este repositório contém um **script para Tampermonkey** que notifica se o motivo do atendimento esta seleciona como "Dúvidas ou Informações" no momento do fechamento no sistema **Integrator 6 da EliteSoft**.
 
 ---
