@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         A1 Alerta - Fechar Atendimento - Luiz Toledo
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  Alerta ao fechar atendimento com motivo "Dúvidas/Informações" no INT6.
 // @author       Luiz Toledo
 // @match        *://integrator6.gegnet.com.br/*
@@ -11,44 +11,24 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
-    let ultimoMotivo = '';
+    let ultimoMotivoDescricao = null;
 
-
-    function observarMotivo() {
-        const dropdown = document.querySelector('p-dropdown[formcontrolname="codmvis"]');
-        if (!dropdown) return;
-
-        new MutationObserver(() => {
-            const label = dropdown.querySelector('.ui-dropdown-label');
-            if (label) {
-                ultimoMotivo = label.textContent.trim().toLowerCase();
-            }
-        }).observe(dropdown, { childList: true, subtree: true });
-    }
-
-
-    const mo = new MutationObserver((_, obs) => {
-        if (document.querySelector('p-dropdown[formcontrolname="codmvis"]')) {
-            observarMotivo();
-            obs.disconnect();
+    setInterval(() => {
+        const campo = document.querySelector('input[formcontrolname="descri_mvis"]');
+        if (campo && campo.value) {
+            ultimoMotivoDescricao = campo.value.trim().toLowerCase();
         }
-    });
-    mo.observe(document.body, { childList: true, subtree: true });
-
+    }, 1000);
 
     document.addEventListener('click', function(e) {
-        const menuItem = e.target.closest('a.ui-menuitem-link');
-        if (!menuItem) return;
-        const textoMenu = menuItem.querySelector('span.ui-menuitem-text')?.innerText.trim();
-        if (textoMenu === 'Fechar Atendimento') {
-
-            if (ultimoMotivo === 'dúvidas ou informações' || ultimoMotivo === 'duvidas ou informacoes') {
-                alert('Atenção: motivo “Dúvidas ou Informações”. Confirme antes de fechar!');
+        const link = e.target.closest('a.ui-menuitem-link');
+        if (link && link.querySelector('span.ui-menuitem-text')?.innerText.trim() === 'Fechar Atendimento') {
+            if (ultimoMotivoDescricao && (ultimoMotivoDescricao.includes('dúvidas') || ultimoMotivoDescricao.includes('informações'))) {
+                alert('Atenção: motivo Dúvidas/Informações. Confirme antes de fechar!');
             }
         }
     }, true);
-
 })();
