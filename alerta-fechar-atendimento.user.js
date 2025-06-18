@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         A1 Alerta - Fechar Atendimento - Luiz Toledo
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Alerta ao fechar atendimento com motivo "Dúvidas/Informações" no INT6.
 // @author       Luiz Toledo
 // @match        *://integrator6.gegnet.com.br/*
@@ -15,19 +15,21 @@
     'use strict';
 
 
-    function motivoEhDuvidasOuInfo() {
+    function descricaoContemDuvidasOuInfo() {
         const campo = document.querySelector('input[formcontrolname="descri_mvis"]');
         if (!campo) return false;
-        const texto = campo.value.toLowerCase();
-        return texto.includes('dúvidas') || texto.includes('informações');
+        const valor = campo.value?.toLowerCase() || '';
+        return valor.includes('dúvidas') || valor.includes('informações');
     }
 
+
     document.addEventListener('click', function(e) {
-        const link = e.target.closest('a.ui-menuitem-link');
-        if (link && link.querySelector('span.ui-menuitem-text')?.innerText.trim() === 'Fechar Atendimento') {
-            if (motivoEhDuvidasOuInfo()) {
-                alert('Atenção: motivo Dúvidas/Informações. Confirme antes de fechar!');
-            }
+        const menuItem = e.target.closest('a.ui-menuitem-link');
+        if (!menuItem) return;
+        const texto = menuItem.querySelector('span.ui-menuitem-text')?.innerText.trim();
+        if (texto === 'Fechar Atendimento' && descricaoContemDuvidasOuInfo()) {
+            alert('Atenção: o motivo contém Dúvidas/Informações. Confirme antes de fechar!');
         }
     }, true);
+
 })();
